@@ -67,7 +67,7 @@ function sendFile(res, filename) {
     });
 }
 
-exports.showFile = function (res, path) {
+exports.show = function (res, path) {
     // Ensure that the given path is a file and is safely within our static directory
     var filename = url.resolve('static/', './' + path);
     if (filename.indexOf('static/') === 0) {
