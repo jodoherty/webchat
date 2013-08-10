@@ -1,0 +1,8 @@
+{
+  "name": "webchat",
+  "version": "0.1.0",
+  "author": "James O'Doherty <jodoherty@gmail.com>",
+  "description": "A web based chat room",
+  "license": "MIT",
+  "dependencies": {}
+}
