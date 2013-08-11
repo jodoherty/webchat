@@ -149,8 +149,9 @@
 
     inputNode.addEventListener('keydown', function (el) {
       var key = el.key || el.keyCode;
-      console.log("Key code : " + key);
-      if (key === 13) { // Enter has been pressed
+      console.log("Key : " + el.key);
+      console.log("Key code : " + el.keyCode);
+      if (key === 13 || key === 'Enter') { // Enter has been pressed
         if (delayActive === false && inputNode.value.trim().length > 0) {
           handleMessage(inputNode.value, function() {
             console.log("Callback called.");
