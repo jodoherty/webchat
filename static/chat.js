@@ -108,7 +108,6 @@
 
   function say(message, callback) {
     doPost('/chat/say', {message: message}, function () {
-      console.log("Response: " + this.responseText);
       res = JSON.parse(this.responseText);
       if (res.error) {
         showMessage({
@@ -148,13 +147,10 @@
     messageContainer = document.getElementById('chat-message-container');
 
     inputNode.addEventListener('keydown', function (el) {
-      var key = el.key || el.keyCode;
-      console.log("Key : " + el.key);
-      console.log("Key code : " + el.keyCode);
-      if (key === 13 || key === 'Enter') { // Enter has been pressed
+      var key = el.keyCode;
+      if (key === 13) { // Enter has been pressed
         if (delayActive === false && inputNode.value.trim().length > 0) {
           handleMessage(inputNode.value, function() {
-            console.log("Callback called.");
             history.push(inputNode.value);
             pos = history.length;
             current = "";
