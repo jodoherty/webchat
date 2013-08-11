@@ -71,7 +71,8 @@
   };
 
   function showMessages(messages) {
-    var i, max;
+    var i;
+    var max;
 
     max = messages.length;
     for (i=0; i < max; i += 1) {

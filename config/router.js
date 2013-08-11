@@ -81,12 +81,15 @@ exports.route = function (handlers, req, res) {
       }
     });
     req.on('end', function () {
-      if (req.headers['content-type'] === 'application/json') {
-        req.body = JSON.parse(data);
-      } else if (req.headers['content-type'] === 'application/x-www-form-urlencoded') {
+      if (req.headers['content-type'] === 'application/x-www-form-urlencoded') {
         req.body = querystring.parse(data);
       } else {
-        req.body = {data: data};
+        try {
+          req.body = JSON.parse(data);
+        } catch (err) {
+          console.log(data);
+          req.body = {};
+        }
       }
       doRoute(handlers, req, res);
     });

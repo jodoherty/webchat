@@ -28,6 +28,7 @@ exports.add = function (username, body) {
     username: username,
     body: body
   });
+  console.log(messages);
   if (messages.length > 200) {
     messages = messages.slice(messages.length-200);
   }
