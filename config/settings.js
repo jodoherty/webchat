@@ -15,7 +15,8 @@ exports.options = {
   base_url: 'http://webchat.chronocompendium.com/',
   auth_url: 'http://www.chronocompendium.com/Forums/hello.php',
   user_timeout: 120000,
-  flood_delay: 1000
+  flood_delay: 1000,
+  port: process.env.PORT || 8081
 };
 
 

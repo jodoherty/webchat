@@ -1,8 +1,11 @@
 {
   "name": "webchat",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "James O'Doherty <jodoherty@gmail.com>",
   "description": "A web based chat room",
   "license": "MIT",
+  "scripts": {
+    "start": "node start"
+  },
   "dependencies": {}
 }
