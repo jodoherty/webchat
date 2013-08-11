@@ -13,7 +13,7 @@ exports['content-types'] = {
 exports.options = {
   title: 'Chrono Compendium WebChat',
   base_url: 'http://webchat.chronocompendium.com/',
-  auth_url: 'http://www.chronocompendium.com/Forums/chat_auth.php',
+  auth_url: 'http://www.chronocompendium.com/Forums/hello.php',
   user_timeout: 120000,
   flood_delay: 1000
 };

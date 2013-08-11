@@ -20,9 +20,12 @@
  * THE SOFTWARE.
  */
 
+var http = require('http');
+var url = require('url');
 var file = require('../models/file');
 var users = require('../models/users');
 var misc = require('../misc');
+var settings = require('../config/settings');
 
 exports.index = function (req, res) {
   if (users.validateSession(req.session)) {
@@ -33,16 +36,49 @@ exports.index = function (req, res) {
 };
 
 exports.doLogin = function (req, res) {
-  var username;
+  var parts = url.parse(settings.options.auth_url);
+  var options = {
+    host: parts.host,
+    path: parts.path,
+    method: 'POST',
+    headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+  };
 
-  if (req.method === 'POST') {
-    username = req.body.username;
-    if (username && !users.exists(username)) {
+  function done(isValid) {
+    var username = req.body.username;
+    if (isValid === true) {
       req.session.username = username;
       users.add(username, req.session.session_id);
-      return misc.redirect(res, '/chat');
+      misc.redirect(res, '/chat');
+    } else {
+      misc.redirect(res, '/');
     }
   }
-  return misc.redirect(res, '/');
+
+  if (req.method === 'POST' && req.body && req.body.username) {
+    var request = http.request(options, function (response) {
+      var username = req.body.username;
+      var data = '';
+      var json;
+
+      response.on('data', function (chunk) {
+        data += chunk.toString();
+      });
+      response.on('end', function () {
+        console.log(data);
+        try {
+          json = JSON.parse(data);
+        } catch(err) {
+          return misc.redirect(res, '/');
+        }
+        console.log(json);
+        done(json);
+      });
+    });
+    request.write('user=' + req.body.username + '&passwrd=' + req.body.password);
+    request.end();
+  } else {
+    misc.redirect(res, '/');
+  }
 };
 
