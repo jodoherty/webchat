@@ -55,7 +55,7 @@ exports.pollMessages = function (req, res) {
     time = users.lastActive(req.session.username);
     users.touch(req.session.username);
     if (req.body && req.body.all && req.body.all === true) {
-      misc.sendJSON(res, messages.poll(0));
+      misc.sendJSON(res, {now: Date.now(), messages: messages.poll(0)});
     } else {
       misc.sendJSON(res, messages.poll(time));
     }

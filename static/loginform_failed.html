@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+	<meta charset="utf-8">
+	<title>WebChat</title>
+	<style>
+		#login-form {
+			width: 500px;
+			border: 1px solid silver;
+			border-radius: 15px;
+			margin: auto;
+			position: relative;
+		}
+
+		#login-form .row {
+			margin: auto 150px auto 30px;
+			height: 30px;
+		}
+
+		#login-form .row label {
+			display: inline-block;
+			width: 100px;
+			text-align: right;
+		}
+
+		#login-form .submit input {
+			position: absolute;
+			right: 55px;
+			top: 15px;
+			width: 100px;
+			height: 30px;
+		}
+
+		h1 {
+			margin-top: 15%;
+		}
+		h1,h2,p {
+			text-align: center;
+		}
+	</style>
+</head>
+<body>
+	<h1>WebChat Login</h1>
+	<h2 style="color: red">Error: Invalid login credentials.</h2>
+	<p>Please try again.</p>
+	<div id="login-form">
+		<form method="POST" action="/login">
+			<div class="row"><label for="username">Username</label> <input type="text" name="username"></div>
+			<div class="row"><label for="password">Password</label> <input type="password" name="password"></div>
+			<div class="submit"><input type="submit"></div>
+		</form>
+	</div>
+</body>
+</html>

@@ -27,6 +27,11 @@ exports.redirect = function (res, path) {
   res.end();
 };
 
+exports.showText = function (res, text) {
+  res.writeHead(200, {'Content-Type': 'text/plain'});
+  res.end(text + '\n\n');
+};
+
 exports.show404 = function (res) {
   res.writeHead(404, {'Content-Type': 'text/plain'});
   res.end('404, page not found\n\n');

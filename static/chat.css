@@ -1,99 +1,107 @@
 html {
-    background: url('/static/background.jpg') no-repeat;
-    background-size: cover;
+  background: url('/static/background.jpg') no-repeat;
+  background-size: cover;
 }
 
 .chat-message-window {
-    background: #fcfcfc;
-    border: 1px solid rgba(0,0,0,.4);
-    border-radius: 8px;
-    box-shadow: 2px 2px 5px rgba(0,0,0,.3);
-    margin: 15px;
-    overflow: hidden;
+  background: #fcfcfc;
+  border: 1px solid rgba(0,0,0,.4);
+  border-radius: 8px;
+  box-shadow: 2px 2px 5px rgba(0,0,0,.3);
+  margin: 15px;
+  overflow: hidden;
 }
 
 .chat-message-window .chat-message-window-username-label {
-    background: white;
-    box-shadow: 0px 1px 2px rgba(0,0,0,.1);
-    padding: 2px 15px 1px 15px;
-    font-size: 11px;
-    font-weight: bold;
-    font-family: Verdana, Sans-Serif;
-    border-bottom: 1px solid silver;
+  background: white;
+  box-shadow: 0px 1px 2px rgba(0,0,0,.1);
+  padding: 2px 15px 1px 15px;
+  font-size: 12px;
+  font-family: Verdana, Sans-Serif;
+  border-bottom: 1px solid silver;
+}
+
+.chat-message-window .chat-message-window-username-label .username {
+  font-weight: bold;
+}
+
+.chat-message-window .chat-message-window-username-label .timestamp {
+  float: right;
+  color: silver;
 }
 
 .chat-message-window .chat-message-window-body {
-    padding: 3px 15px;
-    font-family: Sans-Serif;
-    font-size: 13px;    
+  padding: 3px 15px;
+  font-family: Sans-Serif;
+  font-size: 13px;  
 }
 
 #chat-message-container {
-    position: fixed;
-    top: 0;
-    bottom: 30px;
-    left: 30px;
-    right: 20%;
-    background: rgba(140,130,120,.7);
-    border: 1px solid rgba(0,0,0,.3);
-    overflow: auto;
+  position: fixed;
+  top: 0;
+  bottom: 30px;
+  left: 30px;
+  right: 20%;
+  background: rgba(140,130,120,.7);
+  border: 1px solid rgba(0,0,0,.3);
+  overflow: auto;
 }
 
 #chat-message-input-container {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 30px;
-    background: white;
-    border-top: 1px solid rgba(0,0,0,.8);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background: white;
+  border-top: 1px solid rgba(0,0,0,.8);
 }
 
 #chat-message-input-container #chat-message-input {
-    border: 1px solid rgba(0,0,0,.2);
-    width: 100%;
-    height: 100%;
-    font-family: Monospace;
-    font-size: 12px;
-    line-height: 18px;
-    margin: 0;
-    padding: 0 15px;
+  border: 1px solid rgba(0,0,0,.2);
+  width: 100%;
+  height: 100%;
+  font-family: Monospace;
+  font-size: 12px;
+  line-height: 18px;
+  margin: 0;
+  padding: 0 15px;
 }
 
 #chat-userlist-container {
-    position: fixed;
-    top: 0;
-    left: 80%;
-    right: 0;
-    bottom: 30px;
-    overflow: auto;
+  position: fixed;
+  top: 0;
+  left: 80%;
+  right: 0;
+  bottom: 30px;
+  overflow: auto;
 }
 
 #chat-userlist-container .chat-userlist {
-    margin: 0 30px 0 0;
-    padding: 0;
-    min-height: 100%;
-    border: 1px solid rgba(0,0,0,.5);
-    background: rgba(250,250,250,.8);
-    list-style: none;
+  margin: 0 30px 0 0;
+  padding: 0;
+  min-height: 100%;
+  border: 1px solid rgba(0,0,0,.5);
+  background: rgba(250,250,250,.8);
+  list-style: none;
 }
 
 #chat-userlist-container .chat-userlist li {
-    padding: 3px 10px;
-    border-bottom: 1px solid rgba(0,0,0,.3);
-    background: white;
+  padding: 3px 10px;
+  border-bottom: 1px solid rgba(0,0,0,.3);
+  background: white;
 }
 
 #chat-userlist-container .chat-userlist li:nth-child(even) {
-    background: rgba(255,255,255,.90);
+  background: rgba(255,255,255,.90);
 }
 
 #chat-delay-warning {
-    position: fixed;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    background: url('loader.gif') no-repeat center center;
-    background-size: 100px;
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: url('loader.gif') no-repeat center center;
+  background-size: 100px;
 }

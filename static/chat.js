@@ -9,6 +9,7 @@
   var delayActive = false;
   var userlistContainer;
   var messageContainer;
+  var serverTimeDelta = 0;
 
   function doPost(target, data, callback) {
     var req = new XMLHttpRequest();
@@ -20,7 +21,13 @@
 
   function pollMessages(options) {
     doPost('/chat/poll-messages', options , function () {
-      showMessages(JSON.parse(this.responseText));
+      var json = JSON.parse(this.responseText);
+      if (options.all) {
+        serverTimeDelta = Date.now() - json.now;
+        showMessages(json.messages);
+      } else {
+        showMessages(json);
+      }
       setTimeout(function () {
         pollMessages({});
       }, MESSAGE_UPDATE_INTERVAL);
@@ -37,7 +44,9 @@
   function showMessage(message) {
     var node = document.createElement('div');
     var bodyNode = document.createElement('div');
-    var usernameNode = document.createElement('div');
+    var labelNode = document.createElement('div');
+    var usernameNode = document.createElement('span');
+    var timeNode = document.createElement('span');
     var container = messageContainer;
     var username; 
     var body;
@@ -49,13 +58,20 @@
     username = message.username || "System";
     body = message.body || "";
 
-    usernameNode.appendChild(document.createTextNode(username));
-    bodyNode.appendChild(document.createTextNode(body));
+    usernameNode.className = 'username';
+    timeNode.className = 'timestamp';
     node.className = 'chat-message-window';
-    usernameNode.className = 'chat-message-window-username-label';
+    labelNode.className = 'chat-message-window-username-label';
     bodyNode.className = 'chat-message-window-body';
+    usernameNode.appendChild(document.createTextNode(username));
+    timeNode.appendChild(document.createTextNode(
+          (new Date(serverTimeDelta + message.timestamp)).toString()));
+    console.log(timeNode);
+    labelNode.appendChild(usernameNode);
+    labelNode.appendChild(timeNode);
+    bodyNode.appendChild(document.createTextNode(body));
 
-    node.appendChild(usernameNode);
+    node.appendChild(labelNode);
     node.appendChild(bodyNode);
 
     if (container !== undefined) {

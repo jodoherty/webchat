@@ -51,7 +51,7 @@ exports.doLogin = function (req, res) {
       users.add(username, req.session.session_id);
       misc.redirect(res, '/chat');
     } else {
-      misc.redirect(res, '/');
+      file.show(res, 'loginform_failed.html');
     }
   }
 
@@ -78,7 +78,7 @@ exports.doLogin = function (req, res) {
     request.write('user=' + req.body.username + '&passwrd=' + req.body.password);
     request.end();
   } else {
-    misc.redirect(res, '/');
+    misc.showText(res, 'Invalid submission method. Please use login form.');
   }
 };
 
