@@ -22,7 +22,6 @@
 
 var cookieParser = require('../middleware/cookieParser.js');
 var sessions = require('../middleware/sessions.js');
-var bodyParser = require('../middleware/bodyParser.js');
 
 exports.middleware = [
   cookieParser.middleware,
