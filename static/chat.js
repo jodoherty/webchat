@@ -66,7 +66,6 @@
     usernameNode.appendChild(document.createTextNode(username));
     timeNode.appendChild(document.createTextNode(
           (new Date(serverTimeDelta + message.timestamp)).toString()));
-    console.log(timeNode);
     labelNode.appendChild(usernameNode);
     labelNode.appendChild(timeNode);
     bodyNode.appendChild(document.createTextNode(body));
