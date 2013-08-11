@@ -20,12 +20,27 @@
  * THE SOFTWARE.
  */
 
-var cookieParser = require('../middleware/cookieParser.js');
-var sessions = require('../middleware/sessions.js');
-var bodyParser = require('../middleware/bodyParser.js');
+var messages = [];
 
-exports.middleware = [
-  cookieParser.middleware,
-  sessions.middleware
-];
+exports.add = function (username, body) {
+  messages.push({
+    timestamp: Date.now(),
+    username: username,
+    body: body
+  });
+  if (messages.length > 200) {
+    messages = messages.slice(messages.length-200);
+  }
+};
 
+exports.poll = function (time) {
+  var i, max;
+
+  max = messages.length;
+  for (i = 0; i < max; i += 1) {
+    if (messages[i].timestamp > time) {
+      return messages.slice(i);
+    }
+  }
+  return [];
+};

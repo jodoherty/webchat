@@ -1,4 +1,18 @@
-webchat is a web based chat room by James O'Doherty. You can reach me
-at <jodoherty@gmail.com>.
+    
+    
+WebChat, a web based chat room by James O'Doherty <jodoherty@gmail.com>.
 
-It has hooks that allow users to log in using their SMF forum account.
+This is my first node.js project. I hacked it together over the course
+of one weekend in order to get more familiar with node.js. As such, I
+avoided using any dependencies and stuck to purely to the modules 
+provided by node.js and my knowledge of HTTP and web development. 
+Needless to say, it's more than a little messy. 
+
+Sessions and users aren't very well decoupled at this point. I plan on 
+cleaning this up in the future.
+
+I plan on allowing users to log in using their SMF forum account, since 
+I'm eventually deploying this chat system at The Chrono Compendium: 
+
+    http://webchat.chronocompendium.com/
+

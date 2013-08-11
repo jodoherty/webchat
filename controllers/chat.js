@@ -20,6 +20,66 @@
  * THE SOFTWARE.
  */
 
+var file = require('../models/file');
+var users = require('../models/users');
+var messages = require('../models/messages');
+var misc = require('../misc');
+var settings = require('../config/settings');
+var defaults = require('../config/defaults');
+
 exports.index = function (req, res) {
-    res.end();
-}
+  if (users.validateSession(req.session)) {
+    file.show(res, 'chatview.html');
+  } else {
+    delete req.session;
+    misc.redirect(res, '/');
+  }
+};
+
+exports.pollUsers = function (req, res) {
+  if (req.method !== 'POST') {
+    misc.jsonError(res, "Invalid HTTP Request Method");
+  } else if (users.validateSession(req.session)) {
+    misc.sendJSON(res, users.list());
+  } else {
+    delete req.session;
+    misc.jsonError(res, "Invalid Session Information");
+  }
+};
+
+exports.pollMessages = function (req, res) {
+  var time;
+  if (req.method !== 'POST') {
+    misc.jsonError(res, "Invalid HTTP Request Method");
+  } else if (users.validateSession(req.session)) {
+    time = users.lastActive(req.session.username);
+    users.touch(req.session.username);
+    if (req.body && req.body.all && req.body.all === true) {
+      misc.sendJSON(res, messages.poll(0));
+    } else {
+      misc.sendJSON(res, messages.poll(time));
+    }
+  } else {
+    delete req.session;
+    misc.jsonError(res, "Invalid Session Information");
+  }
+};
+
+exports.say = function (req, res) {
+  var timeout = settings.options.flood_delay || defaults.options.flood_delay;
+
+  if (req.method !== 'POST') {
+    misc.jsonError(res, "Invalid HTTP Request Method");
+  } else if (users.validateSession(req.session)) {
+    if (req.session.last_activity + timeout < Date.now()) {
+      messages.add(req.session.username, req.body.message);
+      req.session.last_activity = Date.now();
+      misc.sendJSON(res, 'Success');
+    } else {
+      misc.jsonError(res, "Flood control activated.");
+    }
+  } else {
+    delete req.session;
+    misc.jsonError(res, "Invalid Session Information");
+  }
+};

@@ -1,116 +1,190 @@
 
-var append_message = function (message, container) {
-    var username,
-        body,
-        node = document.createElement('div'),
-        body_node = document.createElement('div'),
-        username_node = document.createElement('div');
+(function() {
+  var DELAY = 500;
+  var MAX_MESSAGE_COUNT = 200;
+  var USERLIST_UPDATE_INTERVAL = 1000;
+  var MESSAGE_UPDATE_INTERVAL = 300;
+  var message_count = 0;
+  var lastActivity = 0;
+  var delayActive = false;
+  var userlistContainer;
+  var messageContainer;
+
+  function doPost(target, data, callback) {
+    var req = new XMLHttpRequest();
+    req.open('POST', target, true);
+    req.setRequestHeader('Content-Type', 'application/json');
+    req.onload = callback;
+    req.send(JSON.stringify(data));
+  };
+
+  function pollMessages(options) {
+    doPost('/chat/poll-messages', options , function () {
+      showMessages(JSON.parse(this.responseText));
+      setTimeout(function () {
+        pollMessages({});
+      }, MESSAGE_UPDATE_INTERVAL);
+    });
+  };
+
+  function pollUsers() {
+    doPost('/chat/poll-users', null, function () {
+      showUserlist(JSON.parse(this.responseText));
+      setTimeout(pollUsers, USERLIST_UPDATE_INTERVAL);
+    });
+  };
+
+  function showMessage(message) {
+    var node = document.createElement('div');
+    var bodyNode = document.createElement('div');
+    var usernameNode = document.createElement('div');
+    var container = messageContainer;
+    var username; 
+    var body;
 
     if (message === undefined) {
-        message = {};
+      message = {};
     }
 
     username = message.username || "System";
     body = message.body || "";
 
-    username_node.appendChild(document.createTextNode(username));
-    body_node.appendChild(document.createTextNode(body));
+    usernameNode.appendChild(document.createTextNode(username));
+    bodyNode.appendChild(document.createTextNode(body));
     node.className = 'chat-message-window';
-    username_node.className = 'chat-message-window-username-label';
-    body_node.className = 'chat-message-window-body';
+    usernameNode.className = 'chat-message-window-username-label';
+    bodyNode.className = 'chat-message-window-body';
 
-    node.appendChild(username_node);
-    node.appendChild(body_node);
+    node.appendChild(usernameNode);
+    node.appendChild(bodyNode);
 
     if (container !== undefined) {
-        if (container.getElementsByClassName('chat-message-window').length > 100) {
-            container.removeChild(container.firstChild);
-        }
-        container.appendChild(node);
-        node.scrollIntoView();
+      if (message_count > MAX_MESSAGE_COUNT) {
+        container.removeChild(container.firstChild);
+        message_count -= 1;
+      }
+      container.appendChild(node);
+      message_count += 1;
+      node.scrollIntoView();
     }
     return node;
-};
+  };
 
-var update_users = function (users, container) {
-    var list_node = document.createElement('ul'),
-        item_node,
-        i = 0,
-        max = users.length;
+  function showMessages(messages) {
+    var i, max;
 
-    list_node.className = 'chat-userlist';
+    max = messages.length;
+    for (i=0; i < max; i += 1) {
+      showMessage(messages[i]);
+    }
+  };
+
+  function showUserlist(users) {
+    var listNode = document.createElement('ul');
+    var container = userlistContainer;
+    var i;
+    var max;
+    var itemNode;
+
+    listNode.className = 'chat-userlist';
     users.sort();
 
+    max = users.length;
     for (i = 0; i < max; i += 1) {
-        item_node = document.createElement('li');
-        item_node.appendChild(document.createTextNode(users[i]));
-        list_node.appendChild(item_node);
+      itemNode = document.createElement('li');
+      itemNode.appendChild(document.createTextNode(users[i]));
+      listNode.appendChild(itemNode);
     }
 
     if (container !== undefined) {
-        while (container.firstChild) {
-            container.removeChild(container.firstChild);
-        }
-        container.appendChild(list_node);
+      while (container.lastChild) {
+        container.removeChild(container.lastChild);
+      }
+      container.appendChild(listNode);
     }
-    return list_node;
-};
+    return listNode;
+  };
 
-var handle_message = function (message) {
-    var target = document.getElementById('chat-message-container');
-    append_message(message, target);
-};
-
-window.addEventListener('load', function () {
-    var input_node = document.getElementById('chat-message-input'),
-        username = 'user',
-        pos = 0,
-        history = [],
-        current,
-        tmp;
-
-    input_node.addEventListener('change', function () {
-        var value = input_node.value;
+  function say(message, callback) {
+    doPost('/chat/say', {message: message}, function () {
+      res = JSON.parse(this.responseText);
+      if (res.error) {
+        showMessage({
+          username: '*** System Message ***',
+          body: res.message
+        });
+      } else {
+        callback();
+        lastActivity = Date.now();
+      }
     });
-    input_node.addEventListener('keydown', function (el) {
-        var key = el.key || el.keyCode;
-        if (key === 13) { // Enter has been pressed
-            message = {
-                username: username,
-                body: input_node.value,
-            };
-            handle_message(message);
-            history.push(message.body);
+  };
+
+  function handleMessage(message, callback) {
+    var timeDelta = lastActivity + DELAY - Date.now();
+
+    if (timeDelta > 0) {
+      document.getElementById('chat-DELAY-warning').style.display = 'block';
+      delayActive = true;
+      setTimeout(function() {
+        document.getElementById('chat-DELAY-warning').style.display = 'none';
+        delayActive = false;
+        say(message, callback);
+      }, timeDelta);
+    } else {
+      say(message, callback);
+    }
+  };
+
+  window.addEventListener('load', function () {
+    var pos = 0;
+    var history = [];
+    var current;
+    var tmp;
+    var inputNode = document.getElementById('chat-message-input');
+    userlistContainer = document.getElementById('chat-userlist-container');
+    messageContainer = document.getElementById('chat-message-container');
+
+    inputNode.addEventListener('keydown', function (el) {
+      var key = el.key || el.keyCode;
+      if (key === 13) { // Enter has been pressed
+        if (delayActive === false && inputNode.value.trim()) {
+          handleMessage(inputNode.value, function() {
+            history.push(inputNode.value);
             pos = history.length;
             current = "";
-            input_node.value = "";
-            el.preventDefault();
-        } else if (key === 38 || (key === 80 && el.ctrlKey)) { // Up has been pressed
-            if (pos > 0) {
-                if (pos === history.length) {
-                    current = input_node.value || '';
-                }
-                pos -= 1;
-                input_node.value = history[pos];
-            }
-            el.preventDefault();
-        } else if (key === 40 || (key === 78 && el.ctrlKey)) { // Down has been pressed
-            if (history.length > 0) {
-                if (pos < history.length) {
-                    pos += 1;
-                    if (pos === history.length) {
-                        input_node.value = current;
-                    } else {
-                        input_node.value = history[pos];
-                    }
-                } 
-            }
-            el.preventDefault();
-        } else if (key === 9) { // Tab
-            // TODO: Username and special command syntax auto-completion
-            el.preventDefault();
+            inputNode.value = "";
+          });
         }
+        el.preventDefault();
+      } else if (key === 38 || (key === 80 && el.ctrlKey)) { // Up has been pressed
+        if (pos > 0) {
+          if (pos === history.length) {
+            current = inputNode.value || '';
+          }
+          pos -= 1;
+          inputNode.value = history[pos];
+        }
+        el.preventDefault();
+      } else if (key === 40 || (key === 78 && el.ctrlKey)) { // Down has been pressed
+        if (history.length > 0) {
+          if (pos < history.length) {
+            pos += 1;
+            if (pos === history.length) {
+              inputNode.value = current;
+            } else {
+              inputNode.value = history[pos];
+            }
+          } 
+        }
+        el.preventDefault();
+      } else if (key === 9) { // Tab
+        // TODO: Username and special command syntax auto-completion
+        el.preventDefault();
+      }
     });
-    input_node.focus();
-});
-
+    inputNode.focus();
+    pollUsers();
+    pollMessages({all: true});
+  });
+})();

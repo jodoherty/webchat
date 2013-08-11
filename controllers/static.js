@@ -24,10 +24,11 @@ var url = require('url');
 var file = require('../models/file');
 
 exports.index = function (req, res) {
-    var path = url.parse(req.url).pathname.slice('/static/'.length);
-    file.show(res, path);
-}
+  var path = url.parse(req.url).pathname.slice('/static/'.length);
+
+  file.show(res, path);
+};
 
 exports.favicon = function (req, res) {
-    file.show(res, 'favicon.ico');
-}
+  file.show(res, 'favicon.ico');
+};

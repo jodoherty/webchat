@@ -25,10 +25,13 @@ var chat = require('../controllers/chat');
 var static = require('../controllers/static');
 
 exports.handlers = {
-    '^/$': login.index,
-    '^/login$': login.doLogin,
-    '^/chat$': chat.index,
-    '^/static/.*$': static.index,
-    '^/favicon.ico$': static.favicon
+  '^/$': login.index,
+  '^/login$': login.doLogin,
+  '^/chat$': chat.index,
+  '^/chat/poll-users$': chat.pollUsers,
+  '^/chat/poll-messages$': chat.pollMessages,
+  '^/chat/say$': chat.say,
+  '^/static/.*$': static.index,
+  '^/favicon.ico$': static.favicon
 };
 

@@ -20,29 +20,52 @@
  * THE SOFTWARE.
  */
 
-var file = require('../models/file');
-var users = require('../models/users');
+var crypto = require('crypto');
 var misc = require('../misc');
 
-exports.index = function (req, res) {
-  if (users.validateSession(req.session)) {
-    misc.redirect(res, '/chat');
+var sessions = {};
+
+var session_timeout = 2*60*60*1000; // 2 hours
+
+function generate_sid() {
+  return crypto.randomBytes(32).toString('hex');
+}
+
+function create_session() {
+  return {
+    username: undefined,
+    session_id: generate_sid(),
+    timestamp: Date.now(),
+    last_activity: 0
+  };
+}
+
+exports.middleware = function (req, res) {
+  if (req.cookies && req.cookies.session_id && sessions.hasOwnProperty(req.cookies.session_id)) {
+    req.session = sessions[req.cookies.session_id];
+    sessions[req.cookies.session_id].timestamp = Date.now();
   } else {
-    file.show(res, 'loginform.html');
+    // Start a new session
+    req.session = create_session();
   }
+  res.finalize.push(function () {
+    var session = req.session || create_session();
+    if (req.cookies.session_id !== session.session_id) {
+      res.setHeader('Set-Cookie', ['session_id = ' + session.session_id]);
+    }
+    sessions[session.session_id] = session;
+  });
 };
 
-exports.doLogin = function (req, res) {
-  var username;
-
-  if (req.method === 'POST') {
-    username = req.body.username;
-    if (username && !users.exists(username)) {
-      req.session.username = username;
-      users.add(username, req.session.session_id);
-      return misc.redirect(res, '/chat');
+misc.addCleanupHandler(function () {
+  var sid;
+  for (sid in sessions) {
+    if (sessions.hasOwnProperty(sid)) {
+      if (sessions[sid].time + session_timeout < Date.now()) {
+        delete sessions[sid];
+      }
     }
   }
-  return misc.redirect(res, '/');
-};
+  console.log(sessions);
+});
 

@@ -26,22 +26,71 @@ var querystring = require('querystring');
 var middle = require('./middleware');
 var misc = require('../misc');
 
-exports.route = function (handlers, req, res) {
-    var path = url.parse(req.url).pathname,
-        i,
-        max = middle.middleware.length,
-        key;
+var MAX_DATA = 50000;
 
-    for (i=0; i < max; i += 1) {
-        middle.middleware(req, res);
+var doRoute = function (handlers, req, res) {
+  var path = url.parse(req.url).pathname;
+  var writeHead = res.writeHead;
+  var i; 
+  var max; 
+  var key;
+  res.finalize = [];
+
+  max = middle.middleware.length;
+  for (i=0; i < max; i += 1) {
+    middle.middleware[i](req, res);
+  }
+
+  res.writeHead = function (statusCode) {
+    var i, max;
+
+    max = res.finalize.length;
+    for (i = 0; i < max; i += 1) {
+      res.finalize[i]();
     }
 
-    for (key in handlers) {
-        if (handlers.hasOwnProperty(key) && path.search(key) !== -1) {
-            console.log(key + ' : ' + req.url);
-            return handlers[key](req,res);
-        }
+    res.writeHead = writeHead;
+    if (arguments.length === 1) {
+      res.writeHead(statusCode);
+    } else if (arguments.length === 2) {
+      res.writeHead(statusCode, arguments[1]);
+    } else if (arguments.length === 3) {
+      res.writeHead(statusCode, arguments[1], arguments[2]);
     }
-    return misc.show404(res);
+  };
+
+  for (key in handlers) {
+    if (handlers.hasOwnProperty(key) && path.search(key) !== -1) {
+      return handlers[key](req, res);
+    }
+  }
+
+  return misc.show404(res);
 };
 
+exports.route = function (handlers, req, res) {
+  var data;
+  req.body = {};
+
+  if (req.method === 'POST') {
+    data = '';
+    req.on('data', function (chunk) {
+      data += chunk.toString();
+      if (data.length > MAX_DATA) {
+        req.connection.destroy();
+      }
+    });
+    req.on('end', function () {
+      if (req.headers['content-type'] === 'application/json') {
+        req.body = JSON.parse(data);
+      } else if (req.headers['content-type'] === 'application/x-www-form-urlencoded') {
+        req.body = querystring.parse(data);
+      } else {
+        req.body = {data: data};
+      }
+      doRoute(handlers, req, res);
+    });
+  } else {
+    doRoute(handlers, req, res);
+  }
+};

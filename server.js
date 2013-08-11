@@ -21,15 +21,18 @@
  */
 
 var http = require('http');
+var misc = require('./misc');
 
 exports.start = function (route, handlers, options) {
-    var port = options.port || 8080;
+  var port = options.port || 8080;
 
-    http.createServer(function (req, res) {
-        req.server_options = options;
-        route(handlers, req, res);
-    }).listen(port);
+  http.createServer(function (req, res) {
+    req.server_options = options;
+    route(handlers, req, res);
+  }).listen(port);
 
-    console.log('Server running on port ' + port + '.');
-}
+  misc.startCleanupHandlers();
+
+  console.log('Server running on port ' + port + '.');
+};
 

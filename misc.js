@@ -20,9 +20,41 @@
  * THE SOFTWARE.
  */
 
+var handlers = [];
+
+exports.redirect = function (res, path) {
+  res.writeHead(302, {'Location': path});
+  res.end();
+};
 
 exports.show404 = function (res) {
-    res.writeHead(404, {'Content-Type': 'text/plain'});
-    res.end('404, page not found\n\n');
-}
+  res.writeHead(404, {'Content-Type': 'text/plain'});
+  res.end('404, page not found\n\n');
+};
 
+exports.sendJSON = function (res, obj) {
+  res.writeHead(200, {'Content-Type': 'application/json'});
+  res.end(JSON.stringify(obj));
+};
+
+exports.jsonError = function (res, err) {
+  res.writeHead(200, {'Content-Type': 'application/json'});
+  res.end(JSON.stringify({error: true, message: err}));
+};
+
+exports.startCleanupHandlers = function () {
+  function cleanup() {
+    var i, max;
+
+    max = handlers.length;
+    for (i = 0; i < max; i += 1) {
+      handlers[i]();
+    }
+    setTimeout(cleanup, 30000);
+  }
+  cleanup();
+};
+
+exports.addCleanupHandler = function (handler) {
+  handlers.push(handler);
+};

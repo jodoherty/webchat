@@ -88,3 +88,12 @@ html {
     background: rgba(255,255,255,.90);
 }
 
+#chat-delay-warning {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background: url('loader.gif') no-repeat center center;
+    background-size: 100px;
+}

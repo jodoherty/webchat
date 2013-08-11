@@ -20,12 +20,22 @@
  * THE SOFTWARE.
  */
 
-var cookieParser = require('../middleware/cookieParser.js');
-var sessions = require('../middleware/sessions.js');
-var bodyParser = require('../middleware/bodyParser.js');
+exports.middleware = function (req, res) {
+  var cookies_pieces;
+  var i;
+  var max;
+  var index;
+  var key;
+  var value;
 
-exports.middleware = [
-  cookieParser.middleware,
-  sessions.middleware
-];
-
+  req.cookies = {};
+  if (req.headers.cookie) {
+    cookie_pieces = req.headers.cookie.split(';');
+    for (i = 0, max = cookie_pieces.length; i < max; i += 1) {
+      index = cookie_pieces[i].indexOf('=');
+      key = cookie_pieces[i].slice(0,index).trim();
+      value = cookie_pieces[i].slice(index + 1).trim();
+      req.cookies[key] = value;
+    }
+  }
+}
