@@ -17,7 +17,7 @@
     req.setRequestHeader('Content-Type', 'application/json');
     req.onload = callback;
     req.send(JSON.stringify(data));
-  };
+  }
 
   function pollMessages(options) {
     doPost('/chat/poll-messages', options , function () {
@@ -32,14 +32,14 @@
         pollMessages({});
       }, MESSAGE_UPDATE_INTERVAL);
     });
-  };
+  }
 
   function pollUsers() {
     doPost('/chat/poll-users', null, function () {
       showUserlist(JSON.parse(this.responseText));
       setTimeout(pollUsers, USERLIST_UPDATE_INTERVAL);
     });
-  };
+  }
 
   function showMessage(message) {
     var node = document.createElement('div');
@@ -83,7 +83,7 @@
       node.scrollIntoView();
     }
     return node;
-  };
+  }
 
   function showMessages(messages) {
     var i;
@@ -93,7 +93,7 @@
     for (i=0; i < max; i += 1) {
       showMessage(messages[i]);
     }
-  };
+  }
 
   function showUserlist(users) {
     var listNode = document.createElement('ul');
@@ -119,7 +119,7 @@
       container.appendChild(listNode);
     }
     return listNode;
-  };
+  }
 
   function say(message, callback) {
     doPost('/chat/say', {message: message}, function () {
@@ -134,7 +134,7 @@
         lastActivity = Date.now();
       }
     });
-  };
+  }
 
   function handleMessage(message, callback) {
     var timeDelta = lastActivity + DELAY - Date.now();
@@ -150,7 +150,7 @@
     } else {
       say(message, callback);
     }
-  };
+  }
 
   window.addEventListener('load', function () {
     var pos = 0;
@@ -203,4 +203,4 @@
     pollUsers();
     pollMessages({all: true});
   });
-})();
+}());
